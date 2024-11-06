@@ -74,17 +74,23 @@ class FeedController extends Controller
             // Construct the API URL for RSS2JSON
             $apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' . urlencode($feedUrl);
 
+            try {
+                $response = Http::get($apiUrl);
+
+                // Decode the JSON response
+                $data = $response->json();
+
+                // Add the feed data to the feeds array, along with the source URL
+                $feeds[] = [
+                    'source' => $feedUrl,
+                    'items' => $data['items'] ?? [] // Add items to the array, or an empty array if no items
+                ];
+            } catch (\Exception $e) {
+                
+            }
+
             // Fetch the JSON response from the RSS2JSON API
-            $response = Http::get($apiUrl);
 
-            // Decode the JSON response
-            $data = $response->json();
-
-            // Add the feed data to the feeds array, along with the source URL
-            $feeds[] = [
-                'source' => $feedUrl,
-                'items' => $data['items'] ?? [] // Add items to the array, or an empty array if no items
-            ];
         }
 
         // Pass the feeds data to the view
